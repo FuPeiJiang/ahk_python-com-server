@@ -71,10 +71,18 @@ if __name__ == "__main__":
         # this server's (user-friendly) program ID, can be anything you want
         myProgID="Python.SimplifyExpr"
         
+        import ctypes
+        def make_sure_is_admin():
+            try:
+                if ctypes.windll.shell32.IsUserAnAdmin():
+                    return
+            except:
+                pass
+            exit("YOU MUST RUN THIS AS ADMIN")
+
         if sys.argv[1] == "--register":
-            import admin
-            if not admin.isUserAdmin():
-                admin.runAsAdmin()
+            make_sure_is_admin()
+
             import pythoncom
             import os.path
             realPath = os.path.realpath(__file__)
@@ -105,12 +113,10 @@ if __name__ == "__main__":
             # don't use UseCommandLine(), as it will write InProcServer32: pythoncom39.dll
             # win32com.server.register.UseCommandLine(BasicServer)
         elif sys.argv[1] == "--unregister":
-            import admin
+            make_sure_is_admin()
 
             print("Starting to unregister...")
 
-            if not admin.isUserAdmin():
-                admin.runAsAdmin()
             win32com.server.register.UnregisterServer(myClsid, myProgID)
 
             print("Unregistered COM server.")
